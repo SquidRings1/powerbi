@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "date": "2026-03-26T14:42:15.379577",
+  "tables": [
+    {
+      "name": "Flavors",
+      "file": "flavors.csv",
+      "description": "AWS Instance Flavor Types",
+      "recordCount": 10
+    },
+    {
+      "name": "Apps",
+      "file": "apps.csv",
+      "description": "Applications",
+      "recordCount": 15
+    },
+    {
+      "name": "Instances",
+      "file": "instances.csv",
+      "description": "VM Instances",
+      "recordCount": 51
+    },
+    {
+      "name": "Metrics",
+      "file": "metrics.csv",
+      "description": "CPU and RAM Metrics",
+      "recordCount": 1530
+    },
+    {
+      "name": "Timeline",
+      "file": "timeline.csv",
+      "description": "Monthly Evolution Data",
+      "recordCount": 14
+    }
+  ]
+}

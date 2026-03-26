@@ -1,0 +1,16 @@
+AppID,AppName,Domain,Environment
+APP-001,payment-service,Finance,Production
+APP-002,auth-gateway,Security,Production
+APP-003,user-profile-api,CRM,Production
+APP-004,notification-svc,Messaging,Production
+APP-005,report-engine,Analytics,Production
+APP-006,data-ingestion,Data,Staging
+APP-007,order-processor,Commerce,Production
+APP-008,inventory-api,Commerce,Production
+APP-009,search-service,Discovery,Production
+APP-010,ml-scoring,AI/ML,Staging
+APP-011,image-resizer,Media,Production
+APP-012,audit-logger,Security,Production
+APP-013,scheduler-svc,Ops,Staging
+APP-014,api-gateway,Infra,Production
+APP-015,cache-manager,Infra,Production

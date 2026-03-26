@@ -1,0 +1,11 @@
+FlavorID,FlavorName,CPU_vCPU,RAM_GB,Cost_Monthly
+F001,t2.micro,1,1,8.5
+F002,t2.small,1,2,17.0
+F003,t2.medium,2,4,34.0
+F004,t3.medium,2,4,30.6
+F005,t3.large,2,8,61.2
+F006,m5.large,2,8,95.75
+F007,m5.xlarge,4,16,191.5
+F008,m5.2xlarge,8,32,383.0
+F009,c5.xlarge,4,8,170.0
+F010,r5.large,2,16,156.5

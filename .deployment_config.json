@@ -1,0 +1,105 @@
+{
+  "version": "1.0",
+  "created": "2026-03-26T14:42:14.680430",
+  "powerbi": {
+    "service": {
+      "workspace": "FlavorOps",
+      "datasetName": "FlavorOps_Dataset",
+      "reportName": "FlavorOps_Dashboard",
+      "refreshSchedule": "daily"
+    },
+    "desktop": {
+      "autoLoad": true,
+      "autoRefresh": true,
+      "refreshInterval": 60
+    }
+  },
+  "data": {
+    "sourceFormat": "CSV",
+    "location": "/Users/haris/Documents/PROJECTS/powerbi/data",
+    "tables": [
+      {
+        "name": "Flavors",
+        "file": "flavors.csv",
+        "primaryKey": "FlavorName",
+        "type": "Dimension"
+      },
+      {
+        "name": "Apps",
+        "file": "apps.csv",
+        "primaryKey": "AppID",
+        "type": "Dimension"
+      },
+      {
+        "name": "Instances",
+        "file": "instances.csv",
+        "primaryKey": "InstanceID",
+        "type": "Fact",
+        "foreignKeys": {
+          "AppID": "Apps",
+          "FlavorName": "Flavors"
+        }
+      },
+      {
+        "name": "Metrics",
+        "file": "metrics.csv",
+        "primaryKey": "MetricID",
+        "type": "Fact",
+        "foreignKeys": {
+          "InstanceID": "Instances"
+        }
+      },
+      {
+        "name": "Timeline",
+        "file": "timeline.csv",
+        "primaryKey": "TimelineID",
+        "type": "Fact",
+        "foreignKeys": {
+          "AppID": "Apps"
+        }
+      }
+    ]
+  },
+  "theme": {
+    "name": "GitHub Dark",
+    "colors": {
+      "primary": "#2196F3",
+      "critical": "#D32F2F",
+      "warning": "#FF6D00",
+      "success": "#00C853",
+      "secondary": "#7C4DFF",
+      "accent": "#00BCD4",
+      "background": "#0D1117",
+      "surface": "#161B22"
+    }
+  },
+  "measures": {
+    "count": 30,
+    "categories": [
+      "Counts",
+      "Averages",
+      "Rates",
+      "Rankings"
+    ]
+  },
+  "pages": [
+    {
+      "name": "Vue Globale",
+      "description": "Executive Overview",
+      "order": 1,
+      "isDefault": true
+    },
+    {
+      "name": "D\u00e9tail App",
+      "description": "Application Deep-dive",
+      "order": 2,
+      "isDefault": false
+    },
+    {
+      "name": "Instances & Config",
+      "description": "Instance Details",
+      "order": 3,
+      "isDefault": false
+    }
+  ]
+}
