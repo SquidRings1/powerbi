@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlavorOps Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0D1117;
+    --surface: #161B22;
+    --surface2: #1C2330;
+    --border: #2A3445;
+    --accent-blue: #2196F3;
+    --accent-green: #00C853;
+    --accent-orange: #FF6D00;
+    --accent-red: #D32F2F;
+    --accent-purple: #7C4DFF;
+    --accent-cyan: #00BCD4;
+    --text: #E6EDF3;
+    --text-muted: #8B949E;
+    --text-dim: #4A5568;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --glow-blue: 0 0 20px rgba(33,150,243,0.3);
+    --glow-red: 0 0 20px rgba(211,47,47,0.3);
+    --glow-green: 0 0 20px rgba(0,200,83,0.3);
+    --glow-orange: 0 0 20px rgba(255,109,0,0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── TOP NAV ── */
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo {
+    font-family: var(--mono);
+    font-size: 14px; font-weight: 600;
+    color: var(--accent-blue);
+    letter-spacing: 0.08em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo::before {
+    content: '▣';
+    font-size: 18px;
+  }
+  .nav-tabs { display: flex; gap: 4px; margin-left: 16px; }
+  .nav-tab {
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    background: transparent;
+  }
+  .nav-tab:hover { color: var(--text); background: var(--surface2); }
+  .nav-tab.active {
+    color: var(--accent-blue);
+    background: rgba(33,150,243,0.1);
+    border-color: rgba(33,150,243,0.3);
+  }
+  .topbar-right {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 20px 24px; }
+  .page.active { display: block; }
+
+  /* ── GRID SYSTEM ── */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-sidebar { display: grid; grid-template-columns: 220px 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .card.blue::before { background: var(--accent-blue); box-shadow: var(--glow-blue); }
+  .card.green::before { background: var(--accent-green); }
+  .card.orange::before { background: var(--accent-orange); }
+  .card.red::before { background: var(--accent-red); }
+  .card.purple::before { background: var(--accent-purple); }
+
+  /* ── KPI CARDS ── */
+  .kpi-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-family: var(--mono);
+    font-size: 36px; font-weight: 600;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .kpi-sub {
+    font-size: 11px; color: var(--text-muted);
+    font-family: var(--mono);
+  }
+  .kpi-value.blue { color: var(--accent-blue); }
+  .kpi-value.green { color: var(--accent-green); }
+  .kpi-value.orange { color: var(--accent-orange); }
+  .kpi-value.red { color: var(--accent-red); }
+
+  /* ── CHART CONTAINERS ── */
+  .chart-title {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+    color: var(--text-muted); text-transform: uppercase;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .chart-title::before { content: ''; width: 3px; height: 14px; border-radius: 2px; }
+  .card.blue .chart-title::before { background: var(--accent-blue); }
+  .card.green .chart-title::before { background: var(--accent-green); }
+  .card.orange .chart-title::before { background: var(--accent-orange); }
+  .card.purple .chart-title::before { background: var(--accent-purple); }
+  canvas { max-width: 100%; }
+
+  /* ── STATUS BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 8px; border-radius: 3px;
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .badge::before { content: '●'; font-size: 8px; }
+  .badge.critique { background: rgba(211,47,47,0.15); color: #EF5350; border: 1px solid rgba(211,47,47,0.3); }
+  .badge.sur-conso { background: rgba(255,109,0,0.15); color: #FF9800; border: 1px solid rgba(255,109,0,0.3); }
+  .badge.ok { background: rgba(0,200,83,0.12); color: #00C853; border: 1px solid rgba(0,200,83,0.3); }
+  .badge.sous-conso { background: rgba(33,150,243,0.12); color: #42A5F5; border: 1px solid rgba(33,150,243,0.3); }
+
+  /* ── TABLES ── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th {
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  td {
+    padding: 9px 10px;
+    border-bottom: 1px solid rgba(42,52,69,0.5);
+    color: var(--text);
+    font-size: 12px;
+  }
+  tr:hover td { background: rgba(33,150,243,0.04); }
+  .mono { font-family: var(--mono); font-size: 11px; }
+
+  /* ── PERCENTILE BARS ── */
+  .pct-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .pct-bar-bg {
+    flex: 1; height: 6px; background: var(--surface2);
+    border-radius: 3px; overflow: hidden;
+  }
+  .pct-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+  .pct-val { font-family: var(--mono); font-size: 10px; width: 36px; text-align: right; color: var(--text-muted); }
+
+  /* ── SLICERS ── */
+  .slicer-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+  .slicer-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+  .slicer-list { display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow-y: auto; }
+  .slicer-item {
+    padding: 7px 10px; border-radius: 4px;
+    font-size: 12px; cursor: pointer;
+    color: var(--text-muted);
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.15s;
+  }
+  .slicer-item:hover { background: var(--surface2); color: var(--text); }
+  .slicer-item.selected { background: rgba(33,150,243,0.12); color: var(--accent-blue); border-left: 2px solid var(--accent-blue); }
+  .slicer-count { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+
+  /* ── PERCENTILE SELECTOR ── */
+  .pct-selector { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pct-btn {
+    padding: 5px 12px; border-radius: 4px;
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+    border: 1px solid var(--border);
+    color: var(--text-muted); background: transparent;
+  }
+  .pct-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+  .pct-btn.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+
+  /* ── DONUT LEGEND ── */
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+  .legend-item { display: flex; align-items: center; gap: 10px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { font-size: 12px; color: var(--text-muted); flex: 1; }
+  .legend-val { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--text); }
+  .legend-pct { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+
+  .donut-row { display: flex; gap: 24px; align-items: center; }
+  .donut-chart-wrap { width: 200px; height: 200px; flex-shrink: 0; position: relative; }
+  .donut-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; pointer-events: none;
+  }
+  .donut-center-num { font-family: var(--mono); font-size: 28px; font-weight: 600; color: var(--text); }
+  .donut-center-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── DROPDOWN ── */
+  .dropdown-wrap { position: relative; }
+  select {
+    width: 100%; padding: 8px 12px;
+    background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 5px;
+    font-family: var(--sans); font-size: 13px;
+    cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B949E' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+    padding-right: 32px;
+  }
+  select:focus { outline: none; border-color: var(--accent-blue); }
+
+  /* ── INSTANCE DETAIL ── */
+  .inst-header { display: flex; gap: 12px; align-items: center; margin-bottom: 6px; }
+  .inst-id { font-family: var(--mono); font-size: 11px; color: var(--accent-blue); }
+  .flavor-chip {
+    padding: 2px 8px; border-radius: 3px;
+    font-family: var(--mono); font-size: 10px;
+    background: rgba(124,77,255,0.15); color: #CE93D8;
+    border: 1px solid rgba(124,77,255,0.3);
+  }
+  .flavor-arrow { color: var(--text-dim); font-size: 10px; }
+  .flavor-chip.new { background: rgba(0,200,83,0.12); color: #69F0AE; border-color: rgba(0,200,83,0.3); }
+
+  /* ── PROGRESS RING ── */
+  .progress-section { margin-top: 4px; }
+  .prog-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .prog-bar { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+  .prog-fill { height: 100%; border-radius: 2px; }
+
+  /* ── SECTION DIVIDER ── */
+  .section-sep {
+    height: 1px; background: var(--border);
+    margin: 18px 0;
+    position: relative;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .page.active { animation: fadeIn 0.25s ease; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%; animation: pulse 2s infinite; margin-right: 6px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">FlavorOps</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('p-main')">Vue Globale</button>
+    <button class="nav-tab" onclick="showPage('p-app')">Détail App</button>
+    <button class="nav-tab" onclick="showPage('p-instances')">Instances & Config</button>
+  </div>
+  <div class="topbar-right"><span class="live-dot"></span>Données démo · Mars 2026</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 1 : VUE GLOBALE
+════════════════════════════════════════ -->
+<div class="page active" id="p-main">
+
+  <!-- KPI Row -->
+  <div class="grid-4">
+    <div class="card blue">
+      <div class="kpi-label">Total Apps</div>
+      <div class="kpi-value blue">15</div>
+      <div class="kpi-sub">50 instances gérées</div>
+    </div>
+    <div class="card red">
+      <div class="kpi-label">Critiques</div>
+      <div class="kpi-value red">4</div>
+      <div class="kpi-sub">CPU ou RAM &gt; 90% p95</div>
+    </div>
+    <div class="card orange">
+      <div class="kpi-label">Sur-Consommation</div>
+      <div class="kpi-value orange">5</div>
+      <div class="kpi-sub">Flavor sous-dimensionné</div>
+    </div>
+    <div class="card green">
+      <div class="kpi-label">Apps OK</div>
+      <div class="kpi-value green">6</div>
+      <div class="kpi-sub">Consommation correcte</div>
+    </div>
+  </div>
+
+  <!-- Donut + Evolution -->
+  <div class="grid-2">
+
+    <div class="card blue">
+      <div class="chart-title">Répartition statut des Apps</div>
+      <div class="donut-row">
+        <div class="donut-chart-wrap">
+          <canvas id="donutChart"></canvas>
+          <div class="donut-center">
+            <div class="donut-center-num">15</div>
+            <div class="donut-center-lbl">Apps</div>
+          </div>
+        </div>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#D32F2F"></div>
+            <span class="legend-label">Critiques</span>
+            <span class="legend-val">4</span>
+            <span class="legend-pct">27%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#FF6D00"></div>
+            <span class="legend-label">Sur-Conso</span>
+            <span class="legend-val">5</span>
+            <span class="legend-pct">33%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#00C853"></div>
+            <span class="legend-label">OK</span>
+            <span class="legend-val">6</span>
+            <span class="legend-pct">40%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#2196F3"></div>
+            <span class="legend-label">Sous-Conso</span>
+            <span class="legend-val">0</span>
+            <span class="legend-pct">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card green">
+      <div class="chart-title">Évolution — Apps Corrigées (Flavors)</div>
+      <canvas id="evoChart" height="190"></canvas>
+    </div>
+  </div>
+
+  <!-- Top problèmes -->
+  <div class="card orange">
+    <div class="chart-title">Top Apps Problématiques</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>App</th><th>Domaine</th><th>Instances</th>
+            <th>CPU p95 moy.</th><th>RAM p95 moy.</th><th>Statut</th><th>Flavors corrigés</th>
+          </tr>
+        </thead>
+        <tbody id="top-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 2 : DETAIL APP
+════════════════════════════════════════ -->
+<div class="page" id="p-app">
+  <div class="grid-sidebar">
+
+    <!-- Sidebar slicers -->
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="slicer-box">
+        <div class="slicer-label">Application</div>
+        <div class="dropdown-wrap">
+          <select id="app-select" onchange="filterApp()">
+            <option value="ALL">Toutes les apps</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="slicer-box">
+        <div class="slicer-label">Percentile affiché</div>
+        <div class="pct-selector" style="flex-direction:column;gap:4px;" id="pct-btns">
+          <button class="pct-btn" onclick="selectPct('p50',this)">p50</button>
+          <button class="pct-btn" onclick="selectPct('p90',this)">p90</button>
+          <button class="pct-btn active" onclick="selectPct('p95',this)">p95</button>
+          <button class="pct-btn" onclick="selectPct('p99',this)">p99</button>
+        </div>
+      </div>
+
+      <div class="slicer-box">
+        <div class="slicer-label">Statut</div>
+        <div class="slicer-list" id="status-slicer">
+          <div class="slicer-item selected" onclick="filterStatus('ALL',this)">Tous</div>
+          <div class="slicer-item" onclick="filterStatus('CRITIQUE',this)"><span class="badge critique">CRITIQUE</span></div>
+          <div class="slicer-item" onclick="filterStatus('SUR-CONSO',this)"><span class="badge sur-conso">SUR-CONSO</span></div>
+          <div class="slicer-item" onclick="filterStatus('OK',this)"><span class="badge ok">OK</span></div>
+          <div class="slicer-item" onclick="filterStatus('SOUS-CONSO',this)"><span class="badge sous-conso">SOUS-CONSO</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main detail area -->
+    <div>
+      <!-- KPIs for selected app -->
+      <div class="grid-3" id="app-kpis"></div>
+
+      <!-- Instance cards -->
+      <div class="card blue" style="margin-bottom:16px;">
+        <div class="chart-title">Instances — CPU &amp; RAM Percentiles</div>
+        <canvas id="instanceBarChart" height="200"></canvas>
+      </div>
+
+      <div class="card blue">
+        <div class="chart-title">Liste des Instances</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Instance</th><th>App</th><th>Flavor Actuel</th>
+                <th>CPU p50</th><th>CPU p90</th><th>CPU p95</th><th>CPU p99</th>
+                <th>RAM p50</th><th>RAM p90</th><th>RAM p95</th><th>RAM p99</th>
+                <th>Statut</th><th>Recommandé</th>
+              </tr>
+            </thead>
+            <tbody id="inst-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 3 : INSTANCES & CONFIG
+════════════════════════════════════════ -->
+<div class="page" id="p-instances">
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="slicer-box">
+      <div class="slicer-label">Filtrer par App</div>
+      <select id="inst-app-select" onchange="filterInstPage()">
+        <option value="ALL">Toutes</option>
+      </select>
+    </div>
+    <div class="slicer-box">
+      <div class="slicer-label">Filtrer par Flavor</div>
+      <select id="inst-flavor-select" onchange="filterInstPage()">
+        <option value="ALL">Tous</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="card purple">
+      <div class="chart-title">Distribution CPU p95 par Flavor</div>
+      <canvas id="flavorCpuChart" height="220"></canvas>
+    </div>
+    <div class="card blue">
+      <div class="chart-title">Distribution RAM p95 par Flavor</div>
+      <canvas id="flavorRamChart" height="220"></canvas>
+    </div>
+  </div>
+
+  <div class="card blue">
+    <div class="chart-title">Config complète des Instances</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Instance</th><th>App</th>
+            <th>Flavor Actuel</th><th>CPU vCPUs</th><th>RAM GB</th>
+            <th>CPU p50</th><th>CPU p90</th><th>CPU p95</th><th>CPU p99</th>
+            <th>RAM p50</th><th>RAM p90</th><th>RAM p95</th><th>RAM p99</th>
+            <th>Statut</th><th>Flavor Rec.</th><th>Corrigé</th>
+          </tr>
+        </thead>
+        <tbody id="config-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const APPS = [
+  {id:"APP-001",name:"payment-service",  domain:"Finance",   env:"Production"},
+  {id:"APP-002",name:"auth-gateway",     domain:"Security",  env:"Production"},
+  {id:"APP-003",name:"user-profile-api", domain:"CRM",       env:"Production"},
+  {id:"APP-004",name:"notification-svc", domain:"Messaging", env:"Production"},
+  {id:"APP-005",name:"report-engine",    domain:"Analytics", env:"Production"},
+  {id:"APP-006",name:"data-ingestion",   domain:"Data",      env:"Staging"},
+  {id:"APP-007",name:"order-processor",  domain:"Commerce",  env:"Production"},
+  {id:"APP-008",name:"inventory-api",    domain:"Commerce",  env:"Production"},
+  {id:"APP-009",name:"search-service",   domain:"Discovery", env:"Production"},
+  {id:"APP-010",name:"ml-scoring",       domain:"AI/ML",     env:"Staging"},
+  {id:"APP-011",name:"image-resizer",    domain:"Media",     env:"Production"},
+  {id:"APP-012",name:"audit-logger",     domain:"Security",  env:"Production"},
+  {id:"APP-013",name:"scheduler-svc",    domain:"Ops",       env:"Staging"},
+  {id:"APP-014",name:"api-gateway",      domain:"Infra",     env:"Production"},
+  {id:"APP-015",name:"cache-manager",    domain:"Infra",     env:"Production"},
+];
+
+const FLAVORS = [
+  {name:"t2.micro",   cpu:1, ram:1},
+  {name:"t2.small",   cpu:1, ram:2},
+  {name:"t2.medium",  cpu:2, ram:4},
+  {name:"t3.medium",  cpu:2, ram:4},
+  {name:"t3.large",   cpu:2, ram:8},
+  {name:"m5.large",   cpu:2, ram:8},
+  {name:"m5.xlarge",  cpu:4, ram:16},
+  {name:"m5.2xlarge", cpu:8, ram:32},
+  {name:"c5.xlarge",  cpu:4, ram:8},
+  {name:"r5.large",   cpu:2, ram:16},
+];
+
+function seededRand(seed) {
+  let s = seed;
+  return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+const rng = seededRand(42);
+const rnd = (min,max) => rng()*(max-min)+min;
+
+// Generate instances
+const INSTANCES = [];
+let instId = 1;
+const patterns = ["over","correct","under","over","correct","over","correct","over","under","correct","over","correct","under","over","correct"];
+
+APPS.forEach((app, ai) => {
+  const n = Math.floor(rnd(2,5)) + 2;
+  const flavorIdx = Math.floor(rng() * FLAVORS.length);
+  const flavor = FLAVORS[flavorIdx];
+  const pattern = patterns[ai % patterns.length];
+
+  for(let j=0;j<n;j++) {
+    let cpuAvg, ramAvg;
+    if(pattern==="over") { cpuAvg=rnd(75,95); ramAvg=rnd(70,92); }
+    else if(pattern==="under") { cpuAvg=rnd(2,15); ramAvg=rnd(3,18); }
+    else { cpuAvg=rnd(25,65); ramAvg=rnd(20,60); }
+
+    const gp = (avg,s=15) => {
+      const p50=Math.max(1,avg-rnd(0,s*.3));
+      const p90=Math.min(99,avg+rnd(s*.3,s*.7));
+      const p95=Math.min(100,p90+rnd(2,8));
+      const p99=Math.min(100,p95+rnd(2,6));
+      return [p50,p90,p95,p99].map(v=>Math.round(v*10)/10);
+    };
+    const [cp50,cp90,cp95,cp99]=gp(cpuAvg);
+    const [rp50,rp90,rp95,rp99]=gp(ramAvg,12);
+
+    const overCPU=cp95>80, overRAM=rp95>80;
+    const critCPU=cp95>90, critRAM=rp95>90;
+    let status;
+    if(critCPU||critRAM) status="CRITIQUE";
+    else if(overCPU||overRAM) status="SUR-CONSO";
+    else if(cpuAvg<10&&ramAvg<15) status="SOUS-CONSO";
+    else status="OK";
+
+    let recFlavorIdx=flavorIdx;
+    if(overCPU||overRAM) recFlavorIdx=Math.min(flavorIdx+1,FLAVORS.length-1);
+    else if(cpuAvg<10&&ramAvg<15) recFlavorIdx=Math.max(flavorIdx-2,0);
+    const recFlavor=FLAVORS[recFlavorIdx];
+    const corrected = (overCPU||overRAM) && rng()<0.3;
+
+    INSTANCES.push({
+      id:`INST-${String(instId).padStart(4,'0')}`,
+      appId:app.id, appName:app.name, domain:app.domain,
+      flavor:flavor.name, cpuVcpu:flavor.cpu, ramGb:flavor.ram,
+      recFlavor:recFlavor.name,
+      cp50,cp90,cp95,cp99,
+      rp50,rp90,rp95,rp99,
+      cpuAvg:Math.round(cpuAvg*10)/10,
+      ramAvg:Math.round(ramAvg*10)/10,
+      overCPU,overRAM,critCPU,critRAM,
+      status, corrected
+    });
+    instId++;
+  }
+});
+
+// App summary
+const APP_SUMMARY = APPS.map(app => {
+  const rows = INSTANCES.filter(i=>i.appId===app.id);
+  const crit = rows.filter(i=>i.status==="CRITIQUE").length;
+  const sur  = rows.filter(i=>i.status==="SUR-CONSO").length;
+  const ok   = rows.filter(i=>i.status==="OK").length;
+  const under= rows.filter(i=>i.status==="SOUS-CONSO").length;
+  const corr = rows.filter(i=>i.corrected).length;
+  const avgCpu95 = rows.reduce((s,i)=>s+i.cp95,0)/rows.length;
+  const avgRam95 = rows.reduce((s,i)=>s+i.rp95,0)/rows.length;
+  let appStatus;
+  if(crit>0) appStatus="CRITIQUE";
+  else if(sur>rows.length*.4) appStatus="SUR-CONSO";
+  else if(under>rows.length*.5) appStatus="SOUS-CONSO";
+  else appStatus="OK";
+  return {...app, total:rows.length, crit, sur, ok, under, corr, avgCpu95:Math.round(avgCpu95*10)/10, avgRam95:Math.round(avgRam95*10)/10, appStatus};
+});
+
+const EVO = [
+  {m:"2024-01",total:15,crit:6,sur:8,ok:1,corr:0,pct:0},
+  {m:"2024-02",total:15,crit:6,sur:7,ok:2,corr:1,pct:6.7},
+  {m:"2024-03",total:15,crit:5,sur:7,ok:3,corr:2,pct:13.3},
+  {m:"2024-04",total:15,crit:5,sur:6,ok:4,corr:3,pct:20},
+  {m:"2024-05",total:15,crit:5,sur:6,ok:4,corr:4,pct:26.7},
+  {m:"2024-06",total:15,crit:4,sur:6,ok:5,corr:5,pct:33.3},
+  {m:"2024-07",total:15,crit:4,sur:6,ok:5,corr:6,pct:40},
+  {m:"2024-08",total:15,crit:4,sur:5,ok:6,corr:7,pct:46.7},
+  {m:"2024-09",total:15,crit:4,sur:5,ok:6,corr:8,pct:53.3},
+  {m:"2024-10",total:15,crit:4,sur:5,ok:6,corr:8,pct:53.3},
+  {m:"2024-11",total:15,crit:4,sur:5,ok:6,corr:9,pct:60},
+  {m:"2024-12",total:15,crit:4,sur:5,ok:6,corr:9,pct:60},
+  {m:"2025-01",total:15,crit:4,sur:5,ok:6,corr:10,pct:66.7},
+  {m:"2025-02",total:15,crit:4,sur:5,ok:6,corr:11,pct:73.3},
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let selApp = "ALL", selStatus = "ALL", selPct = "p95";
+let charts = {};
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  if(id==='p-app') renderAppPage();
+  if(id==='p-instances') renderInstPage();
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function statusBadge(s) {
+  const map={CRITIQUE:'critique','SUR-CONSO':'sur-conso',OK:'ok','SOUS-CONSO':'sous-conso'};
+  return `<span class="badge ${map[s]||''}">${s}</span>`;
+}
+
+function pctBar(val, thresholds=[50,80,90]) {
+  let color = '#2196F3';
+  if(val>thresholds[2]) color='#D32F2F';
+  else if(val>thresholds[1]) color='#FF6D00';
+  else if(val>thresholds[0]) color='#00C853';
+  return `<div class="pct-bar-wrap"><div class="pct-bar-bg"><div class="pct-bar-fill" style="width:${val}%;background:${color}"></div></div><span class="pct-val">${val}%</span></div>`;
+}
+
+function pctColor(val) {
+  if(val>90) return '#EF5350';
+  if(val>80) return '#FF9800';
+  if(val>50) return '#00C853';
+  return '#42A5F5';
+}
+
+// ── CHART.JS CONFIG ───────────────────────────────────────────────────────────
+Chart.defaults.color = '#8B949E';
+Chart.defaults.borderColor = '#2A3445';
+Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+
+function destroyChart(key) {
+  if(charts[key]) { charts[key].destroy(); delete charts[key]; }
+}
+
+// ── PAGE 1 : VUE GLOBALE ─────────────────────────────────────────────────────
+function initMainPage() {
+  // Donut
+  destroyChart('donut');
+  const ctx = document.getElementById('donutChart').getContext('2d');
+  charts.donut = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Critiques','Sur-Conso','OK','Sous-Conso'],
+      datasets: [{
+        data: [4,5,6,0],
+        backgroundColor: ['#D32F2F','#FF6D00','#00C853','#2196F3'],
+        borderColor: '#0D1117',
+        borderWidth: 3,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      cutout: '68%',
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: '#1C2330', borderColor: '#2A3445', borderWidth: 1,
+        callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} apps (${Math.round(ctx.raw/15*100)}%)` }
+      }},
+      animation: { animateRotate: true, duration: 800 }
+    }
+  });
+
+  // Evo chart
+  destroyChart('evo');
+  const ctx2 = document.getElementById('evoChart').getContext('2d');
+  charts.evo = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: EVO.map(e=>e.m),
+      datasets: [
+        {
+          label:'Apps Corrigées (cumul)',
+          data: EVO.map(e=>e.corr),
+          borderColor:'#00C853', backgroundColor:'rgba(0,200,83,0.12)',
+          fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#00C853'
+        },
+        {
+          label:'Apps Critiques',
+          data: EVO.map(e=>e.crit),
+          borderColor:'#D32F2F', backgroundColor:'rgba(211,47,47,0.06)',
+          fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#D32F2F'
+        },
+        {
+          label:'Apps Sur-Conso',
+          data: EVO.map(e=>e.sur),
+          borderColor:'#FF6D00', backgroundColor:'rgba(255,109,0,0.06)',
+          fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#FF6D00'
+        },
+      ]
+    },
+    options: {
+      responsive:true,
+      plugins: {
+        legend: { display:true, labels:{ boxWidth:10, font:{size:11} } },
+        tooltip: { backgroundColor:'#1C2330', borderColor:'#2A3445', borderWidth:1 }
+      },
+      scales: {
+        x: { grid:{color:'rgba(42,52,69,0.5)'}, ticks:{font:{size:10},maxRotation:45} },
+        y: { grid:{color:'rgba(42,52,69,0.5)'}, ticks:{stepSize:1}, min:0, max:15 }
+      }
+    }
+  });
+
+  // Top problems table
+  const tbody = document.getElementById('top-table');
+  const sorted = [...APP_SUMMARY].sort((a,b) => {
+    const score = x => (x.appStatus==="CRITIQUE"?3:x.appStatus==="SUR-CONSO"?2:0);
+    return score(b)-score(a) || b.avgCpu95-a.avgCpu95;
+  }).slice(0,8);
+
+  tbody.innerHTML = sorted.map(a => `
+    <tr>
+      <td class="mono">${a.name}</td>
+      <td style="color:var(--text-muted)">${a.domain}</td>
+      <td class="mono" style="text-align:center">${a.total}</td>
+      <td>${pctBar(a.avgCpu95)}</td>
+      <td>${pctBar(a.avgRam95)}</td>
+      <td>${statusBadge(a.appStatus)}</td>
+      <td style="text-align:center">
+        ${a.corr > 0 ? `<span style="color:var(--accent-green);font-family:var(--mono);font-size:11px">✓ ${a.corr}/${a.total}</span>` : '<span style="color:var(--text-dim);font-family:var(--mono);font-size:11px">—</span>'}
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ── PAGE 2 : DETAIL APP ───────────────────────────────────────────────────────
+function renderAppPage() {
+  const appSel = document.getElementById('app-select');
+  if(appSel.options.length <= 1) {
+    APPS.forEach(a => {
+      const o = document.createElement('option');
+      o.value = a.id; o.textContent = a.name;
+      appSel.appendChild(o);
+    });
+  }
+  updateAppDetail();
+}
+
+function filterApp() { selApp = document.getElementById('app-select').value; updateAppDetail(); }
+function filterStatus(s, el) {
+  selStatus = s;
+  document.querySelectorAll('#status-slicer .slicer-item').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');
+  updateAppDetail();
+}
+function selectPct(p, el) {
+  selPct = p;
+  document.querySelectorAll('#pct-btns .pct-btn').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  updateAppDetail();
+}
+
+function updateAppDetail() {
+  let rows = selApp==="ALL" ? INSTANCES : INSTANCES.filter(i=>i.appId===selApp);
+  if(selStatus!=="ALL") rows = rows.filter(i=>i.status===selStatus);
+
+  // KPIs
+  const kpiDiv = document.getElementById('app-kpis');
+  const avgCpu = rows.length ? rows.reduce((s,i)=>s+i[`c${selPct}`],0)/rows.length : 0;
+  const avgRam = rows.length ? rows.reduce((s,i)=>s+i[`r${selPct}`],0)/rows.length : 0;
+  kpiDiv.innerHTML = `
+    <div class="card blue"><div class="kpi-label">Instances</div><div class="kpi-value blue">${rows.length}</div><div class="kpi-sub">${selApp==="ALL"?"Toutes apps":"App sélectionnée"}</div></div>
+    <div class="card ${avgCpu>80?'red':avgCpu>50?'orange':'green'}"><div class="kpi-label">CPU ${selPct.toUpperCase()} moyen</div><div class="kpi-value ${avgCpu>80?'red':avgCpu>50?'orange':'green'}">${avgCpu.toFixed(1)}%</div><div class="kpi-sub">Percentile ${selPct}</div></div>
+    <div class="card ${avgRam>80?'red':avgRam>50?'orange':'green'}"><div class="kpi-label">RAM ${selPct.toUpperCase()} moyen</div><div class="kpi-value ${avgRam>80?'red':avgRam>50?'orange':'green'}">${avgRam.toFixed(1)}%</div><div class="kpi-sub">Percentile ${selPct}</div></div>
+  `;
+
+  // Bar chart (top 15 instances)
+  const slice = rows.slice(0,15);
+  destroyChart('instBar');
+  const ctx = document.getElementById('instanceBarChart').getContext('2d');
+  charts.instBar = new Chart(ctx, {
+    type:'bar',
+    data: {
+      labels: slice.map(i=>i.id),
+      datasets: [
+        { label:`CPU ${selPct}`, data:slice.map(i=>i[`c${selPct}`]), backgroundColor:slice.map(i=>pctColor(i[`c${selPct}`])), borderRadius:3 },
+        { label:`RAM ${selPct}`, data:slice.map(i=>i[`r${selPct}`]), backgroundColor:slice.map(i=>pctColor(i[`r${selPct}`])+'88'), borderRadius:3 },
+      ]
+    },
+    options: {
+      responsive:true,
+      plugins:{ legend:{labels:{boxWidth:10,font:{size:11}}}, tooltip:{backgroundColor:'#1C2330',borderColor:'#2A3445',borderWidth:1} },
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:9},maxRotation:45}},
+        y:{grid:{color:'rgba(42,52,69,0.5)'},min:0,max:100,
+          ticks:{callback:v=>v+'%'},
+          afterDraw(chart){
+            const ctx=chart.ctx; ctx.save();
+            [80,90].forEach(line=>{
+              const y=chart.scales.y.getPixelForValue(line);
+              ctx.setLineDash([4,4]);
+              ctx.strokeStyle=line===90?'rgba(211,47,47,0.5)':'rgba(255,109,0,0.4)';
+              ctx.lineWidth=1;
+              ctx.beginPath(); ctx.moveTo(chart.chartArea.left,y); ctx.lineTo(chart.chartArea.right,y); ctx.stroke();
+            });
+            ctx.restore();
+          }
+        }
+      }
+    }
+  });
+
+  // Table
+  const tbody = document.getElementById('inst-table-body');
+  tbody.innerHTML = rows.map(i => `
+    <tr>
+      <td class="mono" style="color:var(--accent-cyan)">${i.id}</td>
+      <td class="mono" style="font-size:10px;color:var(--text-muted)">${i.appName}</td>
+      <td><span class="flavor-chip">${i.flavor}</span></td>
+      <td style="color:${pctColor(i.cp50)};font-family:var(--mono);font-size:11px">${i.cp50}%</td>
+      <td style="color:${pctColor(i.cp90)};font-family:var(--mono);font-size:11px">${i.cp90}%</td>
+      <td style="color:${pctColor(i.cp95)};font-family:var(--mono);font-size:11px;font-weight:600">${i.cp95}%</td>
+      <td style="color:${pctColor(i.cp99)};font-family:var(--mono);font-size:11px">${i.cp99}%</td>
+      <td style="color:${pctColor(i.rp50)};font-family:var(--mono);font-size:11px">${i.rp50}%</td>
+      <td style="color:${pctColor(i.rp90)};font-family:var(--mono);font-size:11px">${i.rp90}%</td>
+      <td style="color:${pctColor(i.rp95)};font-family:var(--mono);font-size:11px;font-weight:600">${i.rp95}%</td>
+      <td style="color:${pctColor(i.rp99)};font-family:var(--mono);font-size:11px">${i.rp99}%</td>
+      <td>${statusBadge(i.status)}</td>
+      <td>${i.recFlavor!==i.flavor?`<span class="flavor-chip new">${i.recFlavor}</span>`:`<span style="color:var(--text-dim);font-size:11px">—</span>`}</td>
+    </tr>
+  `).join('');
+}
+
+// ── PAGE 3 : INSTANCES & CONFIG ───────────────────────────────────────────────
+function renderInstPage() {
+  // Populate selects
+  const appSel2 = document.getElementById('inst-app-select');
+  const flvSel  = document.getElementById('inst-flavor-select');
+  if(appSel2.options.length <= 1) {
+    APPS.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name;appSel2.appendChild(o);});
+    const flvs = [...new Set(INSTANCES.map(i=>i.flavor))].sort();
+    flvs.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;flvSel.appendChild(o);});
+  }
+  filterInstPage();
+}
+
+function filterInstPage() {
+  const appF = document.getElementById('inst-app-select').value;
+  const flvF = document.getElementById('inst-flavor-select').value;
+  let rows = INSTANCES;
+  if(appF!=="ALL") rows=rows.filter(i=>i.appId===appF);
+  if(flvF!=="ALL") rows=rows.filter(i=>i.flavor===flvF);
+
+  // Flavor charts
+  const flavGroups = {};
+  rows.forEach(i=>{ if(!flavGroups[i.flavor]) flavGroups[i.flavor]={cpu:[],ram:[]}; flavGroups[i.flavor].cpu.push(i.cp95); flavGroups[i.flavor].ram.push(i.rp95); });
+  const flavKeys = Object.keys(flavGroups);
+  const avgArr = arr => arr.reduce((s,v)=>s+v,0)/arr.length;
+
+  destroyChart('flvCpu');
+  const ctx3 = document.getElementById('flavorCpuChart').getContext('2d');
+  charts.flvCpu = new Chart(ctx3, {
+    type:'bar',
+    data: {
+      labels: flavKeys,
+      datasets:[{ label:'CPU p95 moyen', data:flavKeys.map(k=>Math.round(avgArr(flavGroups[k].cpu)*10)/10),
+        backgroundColor:flavKeys.map(k=>{const v=avgArr(flavGroups[k].cpu);return pctColor(v)+'CC';}), borderRadius:4 }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1C2330',borderColor:'#2A3445',borderWidth:1}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(42,52,69,0.5)'},min:0,max:100,ticks:{callback:v=>v+'%'}}}
+    }
+  });
+
+  destroyChart('flvRam');
+  const ctx4 = document.getElementById('flavorRamChart').getContext('2d');
+  charts.flvRam = new Chart(ctx4, {
+    type:'bar',
+    data: {
+      labels: flavKeys,
+      datasets:[{ label:'RAM p95 moyen', data:flavKeys.map(k=>Math.round(avgArr(flavGroups[k].ram)*10)/10),
+        backgroundColor:flavKeys.map(k=>{const v=avgArr(flavGroups[k].ram);return pctColor(v)+'CC';}), borderRadius:4 }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1C2330',borderColor:'#2A3445',borderWidth:1}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(42,52,69,0.5)'},min:0,max:100,ticks:{callback:v=>v+'%'}}}
+    }
+  });
+
+  // Full table
+  const tbody = document.getElementById('config-table-body');
+  tbody.innerHTML = rows.map(i => `
+    <tr>
+      <td class="mono" style="color:var(--accent-cyan);font-size:11px">${i.id}</td>
+      <td style="font-size:11px;color:var(--text-muted)">${i.appName}</td>
+      <td><span class="flavor-chip">${i.flavor}</span></td>
+      <td class="mono" style="text-align:center">${i.cpuVcpu}</td>
+      <td class="mono" style="text-align:center">${i.ramGb}</td>
+      <td class="mono" style="color:${pctColor(i.cp50)};font-size:11px">${i.cp50}%</td>
+      <td class="mono" style="color:${pctColor(i.cp90)};font-size:11px">${i.cp90}%</td>
+      <td class="mono" style="color:${pctColor(i.cp95)};font-size:11px;font-weight:600">${i.cp95}%</td>
+      <td class="mono" style="color:${pctColor(i.cp99)};font-size:11px">${i.cp99}%</td>
+      <td class="mono" style="color:${pctColor(i.rp50)};font-size:11px">${i.rp50}%</td>
+      <td class="mono" style="color:${pctColor(i.rp90)};font-size:11px">${i.rp90}%</td>
+      <td class="mono" style="color:${pctColor(i.rp95)};font-size:11px;font-weight:600">${i.rp95}%</td>
+      <td class="mono" style="color:${pctColor(i.rp99)};font-size:11px">${i.rp99}%</td>
+      <td>${statusBadge(i.status)}</td>
+      <td>${i.recFlavor!==i.flavor?`<span class="flavor-chip new" style="font-size:9px">${i.recFlavor}</span>`:`<span style="color:var(--text-dim);font-size:11px">✓ OK</span>`}</td>
+      <td style="text-align:center">${i.corrected?`<span style="color:var(--accent-green);font-size:14px">✓</span>`:`<span style="color:var(--text-dim)">—</span>`}</td>
+    </tr>
+  `).join('');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+initMainPage();
+</script>
+</body>
+</html>

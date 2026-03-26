@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlavorOps Power BI - Project Index</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 40px;
+    }
+    h1 {
+      color: #2c3e50;
+      border-bottom: 4px solid #667eea;
+      padding-bottom: 15px;
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: #667eea;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      border-left: 4px solid #667eea;
+      padding-left: 15px;
+    }
+    .section {
+      background: #f8f9fa;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    .quick-start {
+      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+      border: 2px dashed #667eea;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .file-card {
+      background: white;
+      padding: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+    .file-card:hover {
+      box-shadow: 0 5px 20px rgba(102,126,234,0.2);
+      transform: translateY(-2px);
+    }
+    .file-card h3 {
+      color: #667eea;
+      margin-top: 0;
+    }
+    .file-card p {
+      margin: 10px 0;
+      color: #666;
+      font-size: 0.95em;
+    }
+    .status {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: 600;
+    }
+    .status.ready {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status.todo {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+    .checklist li {
+      padding: 8px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .checklist li:last-child {
+      border-bottom: none;
+    }
+    .checklist li:before {
+      content: "☐ ";
+      color: #667eea;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #667eea;
+    }
+    a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 30px 0;
+      flex-wrap: wrap;
+    }
+    .stat-box {
+      text-align: center;
+      padding: 20px;
+      flex: 1;
+      min-width: 150px;
+    }
+    .stat-number {
+      font-size: 2.5em;
+      color: #667eea;
+      font-weight: bold;
+    }
+    .stat-label {
+      color: #999;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 FlavorOps Power BI Project - Complete Index</h1>
+    
+    <div class="quick-start">
+      <h3>🚀 Quick Start (3 Minutes)</h3>
+      <ol>
+        <li>Generate data: <code>python scripts/generate_data.py</code></li>
+        <li>Read: <a href="README.md">README.md</a> (5 min guide)</li>
+        <li>Open Power BI Desktop</li>
+        <li>Load CSV files from <code>data/</code> folder</li>
+      </ol>
+    </div>
+
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-number">6</div>
+        <div class="stat-label">Documentation Files</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">220+</div>
+        <div class="stat-label">Pages of Content</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">50+</div>
+        <div class="stat-label">DAX Measures</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">5</div>
+        <div class="stat-label">Data Tables</div>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>📚 Documentation Files</h2>
+    <div class="file-grid">
+      <div class="file-card">
+        <h3>README.md</h3>
+        <p><strong>QuickStart Guide</strong></p>
+        <p>5-minute setup guide to get your Power BI dashboard running immediately.</p>
+        <p>⏱️ <strong>Read time:</strong> 5 minutes</p>
+        <span class="status ready">Ready ✓</span>
+      </div>
+
+      <div class="file-card">
+        <h3>SETUP_COMPLETE.md</h3>
+        <p><strong>Complete Overview</strong></p>
+        <p>Comprehensive reference with all files, structure, and what's included.</p>
+        <p>⏱️ <strong>Read time:</strong> 10 minutes</p>
+        <span class="status ready">Ready ✓</span>
+      </div>
+
+      <div class="file-card">
+        <h3>POWERBI_COMPLETE_GUIDE.md</h3>
+        <p><strong>Full Walkthrough (120 pages)</strong></p>
+        <p>12-section guide covering data prep, Power Query, DAX, dashboard design, and more.</p>
+        <p>⏱️ <strong>Read time:</strong> 30 minutes</p>
+        <span class="status ready">Ready ✓</span>
+      </div>
+
+      <div class="file-card">
+        <h3>POWERQUERY_EXAMPLES.md</h3>
+        <p><strong>Power Query Reference (45 pages)</strong></p>
+        <p>Complete M language examples for all 5 tables plus advanced patterns.</p>
+        <p>⏱️ <strong>Read time:</strong> 20 minutes</p>
+        <span class="status ready">Ready ✓</span>
+      </div>
+
+      <div class="file-card">
+        <h3>DAX_MEASURES_REFERENCE.md</h3>
+        <p><strong>DAX Formula Library (55 pages)</strong></p>
+        <p>50+ pre-coded DAX measures ready to copy-paste into Power BI.</p>
+        <p>⏱️ <strong>Read time:</strong> 25 minutes</p>
+        <span class="status ready">Ready ✓</span>
+      </div>
+
+      <div class="file-card">
+        <h3>QUICKREF.py</h3>
+        <p><strong>Quick Reference Script</strong></p>
+        <p>Run to see project structure, quick links, and next steps.</p>
+        <p>Command: <code>python QUICKREF.py</code></p>
+        <span class="status ready">Ready ✓</span>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>🐍 Python Scripts</h2>
+    <div class="section">
+      <h3>scripts/generate_data.py</h3>
+      <p><strong>Data Generator</strong> - Creates 5 realistic CSV files</p>
+      <ul class="checklist">
+        <li>Generates apps.csv (15 applications)</li>
+        <li>Generates instances.csv (~50 VM instances)</li>
+        <li>Generates flavors.csv (10 AWS flavors)</li>
+        <li>Generates metrics.csv (~1500 daily measurements)</li>
+        <li>Generates timeline.csv (14 months of history)</li>
+      </ul>
+      <p><strong>Run:</strong> <code>python scripts/generate_data.py</code></p>
+      <p><strong>Output:</strong> Creates <code>data/</code> folder with 5 CSV files</p>
+      <span class="status ready">Ready ✓</span>
+    </div>
+
+    <div class="section">
+      <h3>scripts/powerbi_python_load.py</h3>
+      <p><strong>Power BI Python Connector</strong> - Load CSVs directly in Power BI</p>
+      <p>Copy this script into Power BI Desktop:</p>
+      <p>Home → Get Data → Python script → Paste this code</p>
+      <p><strong>Automatically loads all 5 CSV files into Power BI</strong></p>
+      <span class="status ready">Ready ✓</span>
+    </div>
+
+    <hr>
+
+    <h2>🎨 Power BI Skill</h2>
+    <div class="section">
+      <h3>.github/skills/powerbi/SKILL.md</h3>
+      <p><strong>Power BI Skill Definition</strong></p>
+      <p>Complete skill with description, quick start, templates, and best practices.</p>
+      <p>This skill encapsulates Power BI knowledge for:</p>
+      <ul class="checklist">
+        <li>Dashboard design & visualization</li>
+        <li>DAX measure creation</li>
+        <li>Power Query transformations</li>
+        <li>Data modeling & relationships</li>
+        <li>Performance optimization</li>
+      </ul>
+      <span class="status ready">Ready ✓</span>
+    </div>
+
+    <hr>
+
+    <h2>📋 Dashboard Structure</h2>
+    <div class="section">
+      <h3>3 Pages</h3>
+      
+      <h4>📊 Page 1: Vue Globale (Global Overview)</h4>
+      <ul class="checklist">
+        <li>4 KPI Cards (Total Apps, Critiques, Sur-Conso, OK)</li>
+        <li>Donut Chart (Status distribution: 4 categories)</li>
+        <li>Line Chart (14-month evolution trend)</li>
+        <li>Top Problems Table (8 worst apps)</li>
+      </ul>
+
+      <h4>🔍 Page 2: Détail App (Application Drill-Down)</h4>
+      <ul class="checklist">
+        <li>App Selector Slicer</li>
+        <li>3 KPI Cards (Instance count, CPU avg, RAM avg)</li>
+        <li>Instance Bar Chart (Top 15 by CPU+RAM)</li>
+        <li>Instance Details Table (with percentiles & recommendations)</li>
+      </ul>
+
+      <h4>⚙️ Page 3: Instances & Config (Full Configuration)</h4>
+      <ul class="checklist">
+        <li>App Filter Dropdown</li>
+        <li>Flavor Filter Dropdown</li>
+        <li>CPU Distribution Chart (by Flavor)</li>
+        <li>RAM Distribution Chart (by Flavor)</li>
+        <li>Complete Instance Configuration Table</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <h2>🗂️ Data Model</h2>
+    <div class="section">
+      <h3>5 Tables with Relationships</h3>
+      <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+Flavors (Lookup)
+  ├─ FlavorID, FlavorName, CPU_vCPU, RAM_GB, Cost_Monthly
+  │
+  └─→ Instances (Dimension)
+        ├─ InstanceID, AppID, FlavorName, Status, Corrected
+        ├─ RecFlavorName, CPU_vCPU, RAM_GB, CreatedDate
+        │
+        ├─→ Metrics (Fact - Large)
+        │     ├─ MetricID, InstanceID, MeasureDate
+        │     ├─ CPU_P50/P90/P95/P99, RAM_P50/P90/P95/P99
+        │     └─ (1500+ daily records)
+        │
+        └─→ Apps (Lookup)
+              ├─ AppID, AppName, Domain, Environment
+              │
+              └─→ Timeline (Time)
+                    ├─ TimelineID, Month, SnapshotDate
+                    ├─ TotalInstances, CriticalCount
+                    ├─ OverConsumptionCount, OKCount, etc.
+                    └─ CorrectionPct, HealthScore
+      </pre>
+    </div>
+
+    <hr>
+
+    <h2>📊 DAX Measures Included</h2>
+    <div class="section">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <h4>📌 Count Measures (8)</h4>
+          <p>Count_Critique, Count_SurConso, Count_OK, Count_SousConso, Count_Total, Count_Corrected, Count_NeedingCorrection, Count_UniqueApps</p>
+        </div>
+        <div>
+          <h4>📈 Average Measures (12)</h4>
+          <p>Avg_CPU_P50/P90/P95/P99, Avg_RAM_P50/P90/P95/P99, Avg_CPU_Overall, Avg_RAM_Overall</p>
+        </div>
+        <div>
+          <h4>📊 Rate & Percentage (10+)</h4>
+          <p>Correction_Rate, Pct_Critique, Pct_SurConso, Pct_OK, Pct_SousConso, Health_Index, AppHealthScore</p>
+        </div>
+        <div>
+          <h4>💰 Cost Measures (4)</h4>
+          <p>Total_Current_Cost, Total_Recommended_Cost, Total_Potential_Savings, Savings_Percentage</p>
+        </div>
+        <div>
+          <h4>🎯 Dynamic Measures (5+)</h4>
+          <p>Selected_App, Overall_Status, Dashboard_Title, Health_Score_Pct, Various formatted displays</p>
+        </div>
+        <div>
+          <h4>🕐 Time-Series (5+)</h4>
+          <p>YTD_Corrections, MTD_Corrections, Trend calculations, Previous period comparisons</p>
+        </div>
+      </div>
+      <p style="margin-top: 20px;"><strong>Total: 50+ pre-coded, ready-to-use DAX formulas</strong></p>
+    </div>
+
+    <hr>
+
+    <h2>✅ Setup Checklist</h2>
+    <ul class="checklist" style="list-style: none; padding: 0;">
+      <li style="padding: 8px 0;">Data generator created ✓</li>
+      <li style="padding: 8px 0;">Python Power BI connector ready ✓</li>
+      <li style="padding: 8px 0;">50+ DAX measures documented ✓</li>
+      <li style="padding: 8px 0;">Power Query examples provided ✓</li>
+      <li style="padding: 8px 0;">Dashboard layouts specified ✓</li>
+      <li style="padding: 8px 0;">Color scheme defined ✓</li>
+      <li style="padding: 8px 0;">Troubleshooting guide included ✓</li>
+      <li style="padding: 8px 0; border-top: 2px solid #667eea; padding-top: 15px; margin-top: 15px;">👉 Next: Run <code>python scripts/generate_data.py</code></li>
+    </ul>
+
+    <hr>
+
+    <h2>📖 How to Use This Project</h2>
+    <div class="section">
+      <h3>Step 1: Quick Start (5 min)</h3>
+      <p>Read <a href="README.md">README.md</a></p>
+      
+      <h3>Step 2: Generate Data</h3>
+      <p><code>python scripts/generate_data.py</code></p>
+      
+      <h3>Step 3: Load into Power BI</h3>
+      <p>Home → Get Data → Text/CSV → Load all 5 files</p>
+      
+      <h3>Step 4: Setup Data Model</h3>
+      <p>Create relationships (see POWERBI_COMPLETE_GUIDE.md Section 3)</p>
+      
+      <h3>Step 5: Add DAX Measures</h3>
+      <p>Copy from <a href="DAX_MEASURES_REFERENCE.md">DAX_MEASURES_REFERENCE.md</a></p>
+      
+      <h3>Step 6: Build Dashboard</h3>
+      <p>Follow layouts in <a href="POWERBI_COMPLETE_GUIDE.md">POWERBI_COMPLETE_GUIDE.md</a> Section 6</p>
+    </div>
+
+    <hr>
+
+    <div style="background: #d4edda; padding: 20px; border-radius: 8px; text-align: center;">
+      <h3 style="margin-top: 0; color: #155724;">✨ Ready to Build Your Dashboard? ✨</h3>
+      <p>Start now with: <code style="background: white; padding: 8px 16px; border-radius: 4px;">python scripts/generate_data.py</code></p>
+      <p style="margin: 15px 0;">Then read: <a href="README.md" style="font-size: 1.1em;">README.md</a></p>
+    </div>
+
+  </div>
+</body>
+</html>
